@@ -88,8 +88,8 @@ max gradiant of softmax(x2) = 2.7839373695215386e-08
 所以除以根号dk是为把qk相乘的方差控制为1。
 
 
-### transformer的优势是什么？
-个人的理解是：
+### Q:transformer的优势是什么？
+A: 个人的理解是：
 
 1. transformer的并行化让大规模的训练成为了可能
 
