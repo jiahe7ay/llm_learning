@@ -93,9 +93,43 @@ A: 个人的理解是：
 
 1. transformer的并行化让大规模的训练成为了可能
 
-2. 在计算序列之间的依赖关系时，Transformer使用自注意力机制，可以将操作数量降至常数级别。举个例子：假设我们需要计算位置1和位置1000的token之间的依赖信息，RNN的操作数量为1000（需要递归传递1000次），而Transformer可以通过一次并行的自注意力机制直接计算所有位置之间的依赖信息，因此操作次数为1。在信息传递的过程中，可能会有信息损失，因此操作数量越多，对序列信息的依赖性越不利。因此，Transformer在这方面的优势尤为明显。
+2. 在计算序列之间的依赖关系时，Transformer使用自注意力机制，可以将操作数量降至常数级别。rnn模型随着timestep的信息的增加，encoder序列之间的相关信息也会衰减，decoder会逐渐“遗忘”源端序列的信息。举个例子：假设我们需要计算位置1和位置1000的token之间的依赖信息，RNN的操作数量为1000（需要递归传递1000次），而Transformer可以通过一次并行的自注意力机制直接计算所有位置之间的依赖信息，因此操作次数为1。在信息传递的过程中，可能会有信息损失，因此操作数量越多，对序列信息的依赖性越不利。因此，Transformer在这方面的优势尤为明显。
+
 
 《attention is all you need 》论文中关于各个架构的操作数计算
 ![qa3](./img/qa5.png)
 
 3. 各个注意头(attention head)可以学会执行不同的任务。
+
+### Q:Transformers 中 FFN 的作用是什么？
+
+A: FFN为模型引入非线性变换,进一步增强模型的representation
+
+
+《Transformer Feed-Forward Layers Are Key-Value Memories》这篇文章通过大量实验和统计得出以下结论：
+
+1. FFN（前馈神经网络）可以被视为一个Key-Value记忆网络，第一层线性变换是Key Memory，第二层线性变换是Value Memory。
+
+2. FFN学到的记忆具有一定的可解释性。例如，低层的Key记住了一些通用模式（比如某种结尾），而高层的Key则记住了一些语义上的模式（比如句子的分类）。
+
+3. Value Memory根据Key Memory记住的模式来预测输出词的分布。
+
+4. 跳跃连接（skip connection）能够细化每层FFN的结果。
+
+
+### Q:自注意力机制中QKV的作用
+
+### Query, Key, Value
+
+Query和Key作用得到的attention权值会作用到Value上。因此它们之间的关系是：
+
+- Query (M * dk) 和 Key (N * dk) 的维度必须一致，而 Value (N * dv) 和 Query/Key 的维度可以不一致。
+
+- Key (N * dk) 和 Value (N * dv) 的长度必须一致。Key和Value本质上对应了同一个序列在不同空间的表达。
+
+- Attention得到的Output (M * dv) 的维度和Value的维度一致，长度和Query一致。
+
+- Output每个位置 i 的向量是由Value的所有位置的向量加权平均后的向量；而其权值是由位置为i的Query和所有位置key经过Attention计算得到的，权值的个数等于Key/Value的长度。
+![qa3](./img/qa6.png)
+
+
