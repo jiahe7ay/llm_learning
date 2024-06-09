@@ -1,5 +1,7 @@
 ## 简介
 
+对苏神的这篇关于sinusoidal位置编码讨论文章：https://spaces.ac.cn/archives/8231 的个人理解
+
 ![./1/简介.png](./1/简介.png)
 
 ### 为什么要位置编码
